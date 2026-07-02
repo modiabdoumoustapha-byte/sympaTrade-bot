@@ -3,665 +3,110 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SympaTrade Pro — Signaux IA</title>
+<title>SympaTrade Pro</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap');
-
-  :root {
-    --bg: #0a0a0f;
-    --surface: #13131a;
-    --surface2: #1c1c26;
-    --border: #2a2a3a;
-    --accent: #6c63ff;
-    --accent2: #a78bfa;
-    --green: #22c55e;
-    --red: #ef4444;
-    --yellow: #f59e0b;
-    --text: #e2e8f0;
-    --text2: #94a3b8;
-    --text3: #64748b;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    padding-bottom: 80px;
-  }
-
-  /* HEADER */
-  .header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .logo {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .live-dot {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--green);
-    font-weight: 500;
-  }
-
-  .live-dot::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: var(--green);
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.3); }
-  }
-
-  /* STATS BAR */
-  .stats-bar {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .stat-item {
-    background: var(--surface);
-    padding: 12px 16px;
-    text-align: center;
-  }
-
-  .stat-value {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .stat-value.green { color: var(--green); }
-  .stat-value.accent { color: var(--accent2); }
-
-  .stat-label {
-    font-size: 10px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 2px;
-  }
-
-  /* SESSION INDICATOR */
-  .session-bar {
-    padding: 10px 16px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    overflow-x: auto;
-  }
-
-  .session-tag {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
-    border: 1px solid var(--border);
-    color: var(--text3);
-  }
-
-  .session-tag.active {
-    background: rgba(108, 99, 255, 0.15);
-    border-color: var(--accent);
-    color: var(--accent2);
-  }
-
-  .session-tag.active::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    background: var(--green);
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-
-  /* SCAN BUTTON */
-  .scan-section {
-    padding: 12px 16px;
-  }
-
-  .scan-btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--accent), #8b5cf6);
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: opacity 0.2s;
-  }
-
-  .scan-btn:active { opacity: 0.8; }
-  .scan-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* SECTION TITLE */
-  .section-title {
-    padding: 16px 16px 8px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .signal-count {
-    background: var(--accent);
-    color: white;
-    font-size: 10px;
-    padding: 2px 7px;
-    border-radius: 10px;
-  }
-
-  /* SIGNAL CARD */
-  .signal-card {
-    margin: 0 16px 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    transition: transform 0.2s;
-  }
-
-  .signal-card:active { transform: scale(0.98); }
-
-  .signal-card.buy { border-left: 3px solid var(--green); }
-  .signal-card.sell { border-left: 3px solid var(--red); }
-
-  .card-header {
-    padding: 14px 16px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .pair-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .pair-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    background: var(--surface2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-  }
-
-  .pair-name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .pair-tf {
-    font-size: 11px;
-    color: var(--text3);
-    margin-top: 1px;
-  }
-
-  .direction-badge {
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-
-  .direction-badge.buy {
-    background: rgba(34, 197, 94, 0.15);
-    color: var(--green);
-  }
-
-  .direction-badge.sell {
-    background: rgba(239, 68, 68, 0.15);
-    color: var(--red);
-  }
-
-  /* CONFIDENCE BAR */
-  .confidence-section {
-    padding: 0 16px 12px;
-  }
-
-  .conf-header {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--text3);
-    margin-bottom: 6px;
-  }
-
-  .conf-value {
-    font-weight: 700;
-    font-size: 13px;
-  }
-
-  .conf-value.high { color: var(--green); }
-  .conf-value.med { color: var(--yellow); }
-  .conf-value.low { color: var(--red); }
-
-  .conf-bar-bg {
-    height: 5px;
-    background: var(--surface2);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
-  .conf-bar-fill {
-    height: 100%;
-    border-radius: 10px;
-    transition: width 1s ease;
-  }
-
-  .conf-bar-fill.high { background: linear-gradient(90deg, #16a34a, var(--green)); }
-  .conf-bar-fill.med { background: linear-gradient(90deg, #d97706, var(--yellow)); }
-  .conf-bar-fill.low { background: linear-gradient(90deg, #dc2626, var(--red)); }
-
-  /* PRICE MAP */
-  .price-map {
-    margin: 0 16px;
-    padding: 12px;
-    background: var(--surface2);
-    border-radius: 10px;
-    margin-bottom: 12px;
-  }
-
-  .price-map-title {
-    font-size: 10px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 10px;
-  }
-
-  .price-track {
-    position: relative;
-    height: 4px;
-    background: var(--border);
-    border-radius: 10px;
-    margin: 16px 0;
-  }
-
-  .price-track-fill {
-    position: absolute;
-    height: 100%;
-    border-radius: 10px;
-  }
-
-  .track-dot {
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 2px solid var(--bg);
-  }
-
-  .track-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 10px;
-    color: var(--text3);
-    margin-top: 6px;
-  }
-
-  /* PRICE LEVELS */
-  .price-levels {
-    padding: 0 16px 14px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-
-  .level-box {
-    background: var(--surface2);
-    border-radius: 10px;
-    padding: 10px;
-    text-align: center;
-  }
-
-  .level-label {
-    font-size: 10px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
-
-  .level-price {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-  }
-
-  .level-price.entry { color: var(--accent2); }
-  .level-price.sl { color: var(--red); }
-  .level-price.tp { color: var(--green); }
-
-  .level-pips {
-    font-size: 9px;
-    color: var(--text3);
-    margin-top: 2px;
-  }
-
-  /* SIGNAL FOOTER */
-  .signal-footer {
-    padding: 10px 16px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .footer-meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 11px;
-    color: var(--text3);
-  }
-
-  .rr-badge {
-    background: rgba(108, 99, 255, 0.15);
-    color: var(--accent2);
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-
-  .status-badge {
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-
-  .status-badge.active {
-    background: rgba(108, 99, 255, 0.15);
-    color: var(--accent2);
-  }
-
-  .status-badge.won {
-    background: rgba(34, 197, 94, 0.15);
-    color: var(--green);
-  }
-
-  .status-badge.lost {
-    background: rgba(239, 68, 68, 0.15);
-    color: var(--red);
-  }
-
-  .status-badge.be {
-    background: rgba(245, 158, 11, 0.15);
-    color: var(--yellow);
-  }
-
-  /* CONFLUENCES */
-  .confluences {
-    padding: 0 16px 14px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .conf-tag {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 10px;
-    color: var(--text2);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  /* EMPTY STATE */
-  .empty-state {
-    text-align: center;
-    padding: 60px 32px;
-    color: var(--text3);
-  }
-
-  .empty-icon { font-size: 48px; margin-bottom: 16px; }
-  .empty-title { font-size: 16px; font-weight: 600; color: var(--text2); margin-bottom: 8px; }
-  .empty-desc { font-size: 13px; line-height: 1.5; }
-
-  /* LOADING */
-  .loading-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(10, 10, 15, 0.85);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .loading-overlay.show { display: flex; }
-
-  .spinner {
-    width: 48px;
-    height: 48px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .loading-text {
-    font-size: 14px;
-    color: var(--text2);
-    font-weight: 500;
-  }
-
-  .loading-pairs {
-    font-size: 12px;
-    color: var(--text3);
-  }
-
-  /* NAV BAR */
-  .nav-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    padding: 8px 0;
-    z-index: 100;
-  }
-
-  .nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    padding: 6px;
-    cursor: pointer;
-    color: var(--text3);
-    font-size: 10px;
-    font-weight: 500;
-    transition: color 0.2s;
-    border: none;
-    background: none;
-  }
-
-  .nav-item.active { color: var(--accent2); }
-  .nav-item span { font-size: 20px; }
-
-  /* TABS */
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  /* HISTORY */
-  .history-item {
-    margin: 0 16px 8px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .history-left { display: flex; align-items: center; gap: 10px; }
-
-  .history-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-  }
-
-  .history-icon.won { background: rgba(34, 197, 94, 0.15); }
-  .history-icon.lost { background: rgba(239, 68, 68, 0.15); }
-  .history-icon.be { background: rgba(245, 158, 11, 0.15); }
-
-  .history-pair {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-  }
-
-  .history-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
-
-  .history-pnl {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-  }
-
-  .history-pnl.won { color: var(--green); }
-  .history-pnl.lost { color: var(--red); }
-  .history-pnl.be { color: var(--yellow); }
-
-  /* TOAST */
-  .toast {
-    position: fixed;
-    top: 70px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-10px);
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 16px;
-    font-size: 13px;
-    color: var(--text);
-    opacity: 0;
-    transition: all 0.3s;
-    z-index: 300;
-    white-space: nowrap;
-  }
-
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  /* ERROR CARD */
-  .error-card {
-    margin: 0 16px 12px;
-    background: rgba(239, 68, 68, 0.08);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    border-radius: 12px;
-    padding: 14px 16px;
-    font-size: 13px;
-    color: #fca5a5;
-    display: none;
-  }
-
-  /* DISCLAIMER */
-  .disclaimer {
-    margin: 8px 16px 0;
-    padding: 10px 12px;
-    background: rgba(245, 158, 11, 0.05);
-    border: 1px solid rgba(245, 158, 11, 0.15);
-    border-radius: 8px;
-    font-size: 10px;
-    color: var(--text3);
-    line-height: 1.4;
-    text-align: center;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c26;--border:#2a2a3a;--accent:#6c63ff;--accent2:#a78bfa;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding-bottom:80px}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.live-dot{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);font-weight:500}
+.live-dot::before{content:'';width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
+.stat-item{background:var(--surface);padding:12px 16px;text-align:center}
+.stat-value{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700}
+.stat-value.green{color:var(--green)}.stat-value.accent{color:var(--accent2)}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.session-bar{padding:10px 16px;display:flex;gap:8px;align-items:center;overflow-x:auto}
+.session-tag{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;border:1px solid var(--border);color:var(--text3)}
+.session-tag.active{background:rgba(108,99,255,.15);border-color:var(--accent);color:var(--accent2)}
+.session-tag.active::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+.scan-section{padding:12px 16px}
+.scan-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border:none;border-radius:12px;color:white;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s}
+.scan-btn:active{opacity:.8}.scan-btn:disabled{opacity:.5;cursor:not-allowed}
+.section-title{padding:16px 16px 8px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between}
+.signal-count{background:var(--accent);color:white;font-size:10px;padding:2px 7px;border-radius:10px}
+.signal-card{margin:0 16px 12px;background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.signal-card.buy{border-left:3px solid var(--green)}.signal-card.sell{border-left:3px solid var(--red)}
+.card-header{padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between}
+.pair-info{display:flex;align-items:center;gap:10px}
+.pair-icon{width:38px;height:38px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:16px}
+.pair-name{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700}
+.pair-tf{font-size:11px;color:var(--text3);margin-top:1px}
+.direction-badge{padding:5px 12px;border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.5px}
+.direction-badge.buy{background:rgba(34,197,94,.15);color:var(--green)}
+.direction-badge.sell{background:rgba(239,68,68,.15);color:var(--red)}
+.confidence-section{padding:0 16px 12px}
+.conf-header{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:6px}
+.conf-value{font-weight:700;font-size:13px}
+.conf-value.high{color:var(--green)}.conf-value.med{color:var(--yellow)}.conf-value.low{color:var(--red)}
+.conf-bar-bg{height:5px;background:var(--surface2);border-radius:10px;overflow:hidden}
+.conf-bar-fill{height:100%;border-radius:10px}
+.conf-bar-fill.high{background:linear-gradient(90deg,#16a34a,var(--green))}
+.conf-bar-fill.med{background:linear-gradient(90deg,#d97706,var(--yellow))}
+.conf-bar-fill.low{background:linear-gradient(90deg,#dc2626,var(--red))}
+.price-levels{padding:0 16px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.level-box{background:var(--surface2);border-radius:10px;padding:10px;text-align:center}
+.level-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.level-price{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700}
+.level-price.entry{color:var(--accent2)}.level-price.sl{color:var(--red)}.level-price.tp{color:var(--green)}
+.level-pips{font-size:9px;color:var(--text3);margin-top:2px}
+.signal-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.footer-meta{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text3)}
+.rr-badge{background:rgba(108,99,255,.15);color:var(--accent2);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.status-badge{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.status-badge.active{background:rgba(108,99,255,.15);color:var(--accent2)}
+.confluences{padding:0 16px 14px;display:flex;flex-wrap:wrap;gap:6px}
+.conf-tag{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;color:var(--text2)}
+.reason-box{margin:0 16px 12px;padding:10px 12px;background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.2);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.5}
+.empty-state{text-align:center;padding:60px 32px;color:var(--text3)}
+.empty-icon{font-size:48px;margin-bottom:16px}
+.empty-title{font-size:16px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.empty-desc{font-size:13px;line-height:1.5}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,15,.9);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loading-overlay.show{display:flex}
+.spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:15px;color:var(--text2);font-weight:600}
+.loading-pair{font-size:13px;color:var(--text3)}
+.loading-progress{font-size:12px;color:var(--accent2);margin-top:4px}
+.nav-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;padding:8px 0;z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;cursor:pointer;color:var(--text3);font-size:10px;font-weight:500;border:none;background:none}
+.nav-item.active{color:var(--accent2)}
+.nav-item span{font-size:20px}
+.tab-content{display:none}.tab-content.active{display:block}
+.history-item{margin:0 16px 8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.history-left{display:flex;align-items:center;gap:10px}
+.history-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.history-icon.won{background:rgba(34,197,94,.15)}.history-icon.lost{background:rgba(239,68,68,.15)}
+.history-pair{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700}
+.history-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.history-pnl{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700}
+.history-pnl.won{color:var(--green)}.history-pnl.lost{color:var(--red)}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--text);opacity:0;transition:all .3s;z-index:300;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.disclaimer{margin:8px 16px 0;padding:10px 12px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);border-radius:8px;font-size:10px;color:var(--text3);line-height:1.4;text-align:center}
+.error-card{margin:8px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px 16px;font-size:13px;color:#fca5a5;display:none}
 </style>
 </head>
 <body>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- LOADING -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
-  <div class="loading-text">Analyse en cours...</div>
-  <div class="loading-pairs" id="loadingPair">Scan des marchés</div>
+  <div class="loading-text">🧠 Claude AI analyse...</div>
+  <div class="loading-pair" id="loadingPair">Initialisation</div>
+  <div class="loading-progress" id="loadingProgress"></div>
 </div>
 
-<!-- HEADER -->
 <div class="header">
   <div class="logo">SympaTrade Pro</div>
-  <div class="live-dot" id="liveStatus">EN DIRECT</div>
+  <div class="live-dot">EN DIRECT</div>
 </div>
 
-<!-- STATS BAR -->
 <div class="stats-bar">
   <div class="stat-item">
     <div class="stat-value green" id="winRate">—</div>
@@ -677,30 +122,21 @@
   </div>
 </div>
 
-<!-- TABS CONTENT -->
 <div class="tab-content active" id="tab-signals">
-
-  <!-- SESSION -->
   <div class="session-bar">
     <div class="session-tag" id="session-london">🇬🇧 Londres 8h–12h</div>
     <div class="session-tag" id="session-ny">🇺🇸 New York 14h–22h</div>
     <div class="session-tag" id="session-time">⏰ Niamey —:—</div>
   </div>
 
-  <!-- SCAN -->
   <div class="scan-section">
     <button class="scan-btn" id="scanBtn" onclick="startScan()">
       🔍 Analyser les marchés
     </button>
   </div>
 
-  <div class="disclaimer">
-    ⚠️ Usage éducatif uniquement. Le trading comporte des risques. Ne jamais investir plus que ce que vous pouvez vous permettre de perdre.
-  </div>
-
-  <div class="error-card" id="errorCard">
-    ❌ <span id="errorMsg">Erreur d'analyse</span>
-  </div>
+  <div class="disclaimer">⚠️ Usage éducatif uniquement. Le trading comporte des risques. Ne jamais investir plus que ce que vous pouvez vous permettre de perdre.</div>
+  <div class="error-card" id="errorCard"><span id="errorMsg"></span></div>
 
   <div class="section-title">
     Signaux actifs
@@ -711,81 +147,69 @@
     <div class="empty-state">
       <div class="empty-icon">📡</div>
       <div class="empty-title">Aucun signal actif</div>
-      <div class="empty-desc">Appuie sur "Analyser les marchés" pour scanner les 21 paires pendant les sessions Londres et New York.</div>
+      <div class="empty-desc">Appuie sur "Analyser les marchés" pour scanner les 21 paires avec Claude AI.</div>
     </div>
   </div>
-
 </div>
 
 <div class="tab-content" id="tab-history">
-  <div class="section-title">Historique des signaux</div>
+  <div class="section-title">Historique</div>
   <div id="historyContainer">
     <div class="empty-state">
       <div class="empty-icon">📋</div>
       <div class="empty-title">Aucun historique</div>
-      <div class="empty-desc">Tes signaux passés apparaîtront ici après chaque analyse.</div>
+      <div class="empty-desc">Tes signaux passés apparaîtront ici.</div>
     </div>
   </div>
 </div>
 
 <div class="tab-content" id="tab-info">
-  <div style="padding: 20px 16px;">
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
-      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--accent2);">📊 Stratégie Price Action Pure</div>
-      <div style="font-size: 13px; color: var(--text2); line-height: 1.7;">
-        <p style="margin-bottom: 8px;">La stratégie analyse <strong>5 critères</strong> indépendants du bot Telegram :</p>
-        <p>🔷 <strong>Structure marché</strong> — Swing High/Low, Supports/Résistances</p>
-        <p>🕯️ <strong>Patterns bougies</strong> — Engulfing, Pin Bar, Inside Bar, Doji</p>
-        <p>📐 <strong>Fibonacci</strong> — Retracements 50%-61.8%</p>
-        <p>💧 <strong>Zones de liquidité</strong> — Niveaux psychologiques clés</p>
-        <p>⚡ <strong>Momentum</strong> — Volume et divergences</p>
+  <div style="padding:20px 16px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:12px;color:var(--accent2)">📊 Stratégie Price Action Pure</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        <p>🔷 Structure marché — Swing High/Low, Supports/Résistances</p>
+        <p>🕯️ Patterns bougies — Engulfing, Pin Bar, Inside Bar</p>
+        <p>📐 Fibonacci — Retracements 50%-61.8%</p>
+        <p>💧 Zones de liquidité — Niveaux psychologiques</p>
+        <p>⚡ Momentum — Volume et divergences</p>
       </div>
     </div>
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
-      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--accent2);">⚙️ Paramètres</div>
-      <div style="font-size: 13px; color: var(--text2); line-height: 2;">
-        <div style="display: flex; justify-content: space-between;"><span>Stop Loss</span><span style="color: var(--red);">20 pips</span></div>
-        <div style="display: flex; justify-content: space-between;"><span>Take Profit</span><span style="color: var(--green);">40 pips</span></div>
-        <div style="display: flex; justify-content: space-between;"><span>R/R Ratio</span><span style="color: var(--accent2);">1:2</span></div>
-        <div style="display: flex; justify-content: space-between;"><span>Risque recommandé</span><span style="color: var(--yellow);">1% max</span></div>
-        <div style="display: flex; justify-content: space-between;"><span>Session Londres</span><span>8h–12h Niamey</span></div>
-        <div style="display: flex; justify-content: space-between;"><span>Session New York</span><span>14h–22h Niamey</span></div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:12px;color:var(--accent2)">⚙️ Paramètres</div>
+      <div style="font-size:13px;color:var(--text2);line-height:2.2">
+        <div style="display:flex;justify-content:space-between"><span>Stop Loss</span><span style="color:var(--red)">20 pips</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Take Profit</span><span style="color:var(--green)">40 pips</span></div>
+        <div style="display:flex;justify-content:space-between"><span>R/R Ratio</span><span style="color:var(--accent2)">1:2</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Risque recommandé</span><span style="color:var(--yellow)">1% max — 0.01 lot</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Londres</span><span>8h–12h Niamey</span></div>
+        <div style="display:flex;justify-content:space-between"><span>New York</span><span>14h–22h Niamey</span></div>
       </div>
     </div>
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px;">
-      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--accent2);">💱 Paires analysées (21)</div>
-      <div style="font-size: 12px; color: var(--text2); line-height: 2; columns: 2;">
-        EUR/USD · GBP/USD · USD/JPY · USD/CHF · AUD/USD · NZD/USD · USD/CAD · EUR/GBP · EUR/JPY · GBP/JPY · EUR/AUD · GBP/AUD · AUD/JPY · EUR/CAD · GBP/CAD · EUR/NZD · GBP/NZD · CAD/JPY · CHF/JPY · XAU/USD
-      </div>
+    <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:16px;padding:16px">
+      <div style="font-size:13px;font-weight:700;color:#fca5a5;margin-bottom:8px">🚨 Règle absolue</div>
+      <div style="font-size:13px;color:var(--text2)">Toujours trader avec <strong>0.01 lot maximum</strong> jusqu'à 3 mois de résultats positifs consécutifs.</div>
     </div>
   </div>
 </div>
 
-<!-- NAV BAR -->
 <div class="nav-bar">
-  <button class="nav-item active" onclick="switchTab('signals', this)">
-    <span>📡</span>Signaux
-  </button>
-  <button class="nav-item" onclick="switchTab('history', this)">
-    <span>📋</span>Historique
-  </button>
-  <button class="nav-item" onclick="switchTab('info', this)">
-    <span>⚙️</span>Stratégie
-  </button>
+  <button class="nav-item active" onclick="switchTab('signals',this)"><span>📡</span>Signaux</button>
+  <button class="nav-item" onclick="switchTab('history',this)"><span>📋</span>Historique</button>
+  <button class="nav-item" onclick="switchTab('info',this)"><span>⚙️</span>Stratégie</button>
 </div>
 
 <script>
-const PAIRS = {
-  "EUR/USD": "EURUSD=X", "GBP/USD": "GBPUSD=X", "USD/JPY": "USDJPY=X",
-  "USD/CHF": "USDCHF=X", "AUD/USD": "AUDUSD=X", "NZD/USD": "NZDUSD=X",
-  "USD/CAD": "USDCAD=X", "EUR/GBP": "EURGBP=X", "EUR/JPY": "EURJPY=X",
-  "GBP/JPY": "GBPJPY=X", "EUR/AUD": "EURAUD=X", "GBP/AUD": "GBPAUD=X",
-  "AUD/JPY": "AUDJPY=X", "EUR/CAD": "EURCAD=X", "GBP/CAD": "GBPCAD=X",
-  "EUR/NZD": "EURNZD=X", "GBP/NZD": "GBPNZD=X", "CAD/JPY": "CADJPY=X",
-  "CHF/JPY": "CHFJPY=X", "XAU/USD": "GC=F"
-};
+const API_KEY = "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";
 
-const PAIR_ICONS = {
+const PAIRS = [
+  "EUR/USD","GBP/USD","USD/JPY","USD/CHF","AUD/USD",
+  "NZD/USD","USD/CAD","EUR/GBP","EUR/JPY","GBP/JPY",
+  "EUR/AUD","GBP/AUD","AUD/JPY","EUR/CAD","GBP/CAD",
+  "EUR/NZD","GBP/NZD","CAD/JPY","CHF/JPY","XAU/USD"
+];
+
+const ICONS = {
   "EUR/USD":"🇪🇺","GBP/USD":"🇬🇧","USD/JPY":"🇯🇵","USD/CHF":"🇨🇭",
   "AUD/USD":"🇦🇺","NZD/USD":"🇳🇿","USD/CAD":"🇨🇦","EUR/GBP":"🇪🇺",
   "EUR/JPY":"🇯🇵","GBP/JPY":"🇬🇧","EUR/AUD":"🇦🇺","GBP/AUD":"🇦🇺",
@@ -793,9 +217,279 @@ const PAIR_ICONS = {
   "GBP/NZD":"🇳🇿","CAD/JPY":"🇨🇦","CHF/JPY":"🇨🇭","XAU/USD":"🥇"
 };
 
-let signals = [];
-let history = [];
-let scanning = false;
+let signals = [], history = [], scanning = false;
 
-// ── CLAUDE AI ANALYSIS ──────────────────────────────────────
-async function analyzeWithCl
+function getNiameyTime() {
+  return new Date(new Date().toLocaleString('en-US', {timeZone:'Africa/Niamey'}));
+}
+
+function isSession() {
+  const t = getNiameyTime();
+  const h = t.getHours(), d = t.getDay();
+  if(d===0||d===6) return false;
+  if(d===5&&h>=20) return false;
+  return (h>=8&&h<12)||(h>=14&&h<22);
+}
+
+function updateSession() {
+  const t = getNiameyTime();
+  const h = t.getHours(), m = String(t.getMinutes()).padStart(2,'0');
+  document.getElementById('session-london').className = 'session-tag'+(h>=8&&h<12?' active':'');
+  document.getElementById('session-ny').className = 'session-tag'+(h>=14&&h<22?' active':'');
+  document.getElementById('session-time').textContent = `⏰ Niamey ${h}:${m}`;
+}
+
+async function analyzeWithClaude(pairs) {
+  const now = getNiameyTime();
+  const timeStr = now.toLocaleString('fr-FR');
+  
+  const prompt = `Tu es un expert trader Price Action avec 15 ans d'expérience sur le Forex et l'Or (XAU/USD).
+
+Date et heure actuelles à Niamey (Niger, UTC+1): ${timeStr}
+
+Analyse ces ${pairs.length} paires Forex/Gold en utilisant ta connaissance des marchés financiers et la stratégie Price Action Pure:
+Paires: ${pairs.join(', ')}
+
+Pour chaque paire, applique cette stratégie Price Action Pure:
+1. Structure du marché (tendance actuelle, Swing High/Low, Support/Résistance)
+2. Patterns de bougies (Engulfing, Pin Bar, Inside Bar, Doji)
+3. Retracements Fibonacci (zones 50%-61.8%)
+4. Zones de liquidité (niveaux psychologiques ronds)
+5. Momentum et force de la tendance
+
+Paramètres de trading:
+- Sessions actives: Londres (8h-12h) et New York (14h-22h) heure Niamey
+- Stop Loss: 20 pips
+- Take Profit: 40 pips (R/R 1:2)
+- Pour XAU/USD: SL 200 points, TP 400 points
+
+Génère des signaux UNIQUEMENT pour les paires avec au minimum 3 critères Price Action alignés ET une confiance >= 60%.
+
+Réponds UNIQUEMENT avec ce JSON valide (rien d'autre, pas de texte avant ou après):
+{
+  "signals": [
+    {
+      "symbol": "EUR/USD",
+      "direction": "BUY",
+      "confidence": 78,
+      "entry": 1.08450,
+      "sl": 1.08250,
+      "tp": 1.08850,
+      "rr": "1:2",
+      "confluences": ["Pin Bar haussier sur support 1.0840", "Fibonacci 61.8% respecté", "Structure haussière H1", "Zone psychologique 1.0850"],
+      "reason": "Rebond fort sur support clé avec confirmation Price Action"
+    }
+  ]
+}
+
+Si aucune paire ne présente de setup valide, retourne: {"signals": []}`;
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 2000,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const text = data.content[0].text.trim();
+  const clean = text.replace(/```json|```/g, '').trim();
+  return JSON.parse(clean);
+}
+
+async function startScan() {
+  if (scanning) return;
+  scanning = true;
+
+  const btn = document.getElementById('scanBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyse en cours...';
+  document.getElementById('loadingOverlay').classList.add('show');
+  document.getElementById('errorCard').style.display = 'none';
+  signals = [];
+
+  // Analyser en groupes de 5 paires
+  const groups = [];
+  for (let i = 0; i < PAIRS.length; i += 5) {
+    groups.push(PAIRS.slice(i, i + 5));
+  }
+
+  let totalFound = 0;
+
+  for (let g = 0; g < groups.length; g++) {
+    const group = groups[g];
+    document.getElementById('loadingPair').textContent = `Analyse: ${group.join(' · ')}`;
+    document.getElementById('loadingProgress').textContent = `Groupe ${g+1}/${groups.length}`;
+
+    try {
+      const result = await analyzeWithClaude(group);
+      
+      if (result.signals && result.signals.length > 0) {
+        for (const sig of result.signals) {
+          signals.push({
+            ...sig,
+            id: Date.now() + Math.random(),
+            icon: ICONS[sig.symbol] || '💱',
+            time: getNiameyTime().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}),
+            status: 'active'
+          });
+          totalFound++;
+        }
+        renderSignals();
+      }
+    } catch(e) {
+      console.error('Erreur groupe', g, e);
+    }
+
+    if (g < groups.length - 1) {
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  }
+
+  document.getElementById('loadingOverlay').classList.remove('show');
+  scanning = false;
+  btn.disabled = false;
+  btn.innerHTML = '🔍 Analyser les marchés';
+  updateStats();
+
+  if (totalFound === 0) {
+    document.getElementById('errorCard').style.display = 'block';
+    document.getElementById('errorMsg').textContent = 
+      isSession() 
+        ? '🔍 Aucun setup Price Action de qualité détecté sur les 20 paires. Le marché est en consolidation. Réessaie dans 15 minutes.'
+        : '⏰ Hors session de trading. Les signaux apparaissent pendant Londres (8h-12h) et New York (14h-22h) heure Niamey.';
+  } else {
+    showToast(`✅ ${totalFound} signal(s) Price Action détecté(s) !`);
+  }
+}
+
+function renderSignals() {
+  const container = document.getElementById('signalsContainer');
+  document.getElementById('activeCount').textContent = signals.length;
+
+  if (signals.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📡</div><div class="empty-title">Aucun signal actif</div><div class="empty-desc">Appuie sur "Analyser les marchés" pour scanner avec Claude AI.</div></div>`;
+    return;
+  }
+
+  container.innerHTML = signals.map(sig => {
+    const dir = sig.direction === 'BUY' ? 'buy' : 'sell';
+    const cc = sig.confidence >= 75 ? 'high' : sig.confidence >= 60 ? 'med' : 'low';
+    const cl = sig.confidence >= 75 ? '🟢 Élevée' : sig.confidence >= 60 ? '🟡 Moyenne' : '🔴 Faible';
+    
+    const isJPY = sig.symbol.includes('JPY');
+    const isXAU = sig.symbol.includes('XAU');
+    const mult = isXAU ? 1 : isJPY ? 100 : 10000;
+    
+    const entry = parseFloat(sig.entry);
+    const sl = parseFloat(sig.sl);
+    const tp = parseFloat(sig.tp);
+    
+    const slPips = Math.abs((entry - sl) * mult).toFixed(0);
+    const tpPips = Math.abs((tp - entry) * mult).toFixed(0);
+    
+    const decimals = isXAU ? 2 : isJPY ? 3 : 5;
+    
+    const confs = (sig.confluences || []).slice(0,5).map(c => 
+      `<div class="conf-tag">✓ ${c}</div>`
+    ).join('');
+
+    return `
+    <div class="signal-card ${dir}">
+      <div class="card-header">
+        <div class="pair-info">
+          <div class="pair-icon">${sig.icon}</div>
+          <div>
+            <div class="pair-name">${sig.symbol}</div>
+            <div class="pair-tf">Price Action · ${sig.time}</div>
+          </div>
+        </div>
+        <div class="direction-badge ${dir}">${sig.direction === 'BUY' ? '▲ BUY' : '▼ SELL'}</div>
+      </div>
+
+      <div class="confidence-section">
+        <div class="conf-header">
+          <span>Confiance IA : ${cl}</span>
+          <span class="conf-value ${cc}">${sig.confidence}%</span>
+        </div>
+        <div class="conf-bar-bg">
+          <div class="conf-bar-fill ${cc}" style="width:${sig.confidence}%"></div>
+        </div>
+      </div>
+
+      <div class="price-levels">
+        <div class="level-box">
+          <div class="level-label">Entrée</div>
+          <div class="level-price entry">${entry.toFixed(decimals)}</div>
+          <div class="level-pips">Au marché</div>
+        </div>
+        <div class="level-box">
+          <div class="level-label">Stop Loss</div>
+          <div class="level-price sl">${sl.toFixed(decimals)}</div>
+          <div class="level-pips">${slPips} pips</div>
+        </div>
+        <div class="level-box">
+          <div class="level-label">Take Profit</div>
+          <div class="level-price tp">${tp.toFixed(decimals)}</div>
+          <div class="level-pips">${tpPips} pips</div>
+        </div>
+      </div>
+
+      <div class="confluences">${confs}</div>
+
+      ${sig.reason ? `<div class="reason-box">💡 ${sig.reason}</div>` : ''}
+
+      <div class="signal-footer">
+        <div class="footer-meta">
+          <span class="rr-badge">R/R ${sig.rr || '1:2'}</span>
+          <span>📊 ${(sig.confluences||[]).length}/5 critères</span>
+        </div>
+        <span class="status-badge active">● ACTIF</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateStats() {
+  const total = history.length + signals.length;
+  const wins = history.filter(h => h.result === 'won').length;
+  const wr = history.length > 0 ? Math.round(wins/history.length*100) : 0;
+  const allConf = signals.map(s => s.confidence);
+  const avg = allConf.length > 0 ? Math.round(allConf.reduce((a,b)=>a+b,0)/allConf.length) : 0;
+  document.getElementById('totalSignals').textContent = total;
+  document.getElementById('winRate').textContent = history.length > 0 ? wr+'%' : '—';
+  document.getElementById('avgConf').textContent = avg > 0 ? avg+'%' : '—';
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+updateSession();
+setInterval(updateSession, 30000);
+renderSignals();
+</script>
+</body>
+</html>
